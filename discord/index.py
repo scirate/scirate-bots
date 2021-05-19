@@ -18,7 +18,6 @@ async def on_ready():
 
 @bot.command()
 async def top(ctx):
-    res = []
     global called
     if called:
         msg = await ctx.send('`Session Already Active`')
