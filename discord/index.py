@@ -21,7 +21,6 @@ async def on_ready():
 @bot.command()
 @has_permissions(manage_roles=True, ban_members=True)
 async def top(ctx):
-    res = []
     global called
     global break_loop    
     if called:
