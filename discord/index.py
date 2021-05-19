@@ -21,8 +21,7 @@ async def on_ready():
 @bot.command()
 @has_permissions(manage_roles=True, ban_members=True)
 async def top(ctx):
-    global called
-    global break_loop    
+    global called, break_loop    
     if called:
         msg = await ctx.reply('`Session Already Active`')
         return await msg.delete(delay=5)
