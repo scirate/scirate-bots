@@ -28,8 +28,7 @@ async def top(ctx):
         return await msg.delete(delay=5)
     else: 
         await ctx.reply('`Starting Subscription`')   
-        called = True
-        break_loop = False
+        called, break_loop = True, False
         while True and not break_loop:
             embed = None
             embed = await _fetch(ctx, res)
