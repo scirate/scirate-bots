@@ -1,11 +1,13 @@
 import asyncio
 import discord 
-from discord.ext import commands, tasks
+from discord.ext import commands
+from discord.ext.commands import has_permissions, MissingPermissions
 import aiohttp 
 from bs4 import BeautifulSoup
 import config
 
 called = False
+break_loop = False
 bot=commands.Bot(command_prefix=commands.when_mentioned_or(config.PREFIX), 
                 intents = discord.Intents.default()
 )
@@ -17,19 +19,30 @@ async def on_ready():
     return
 
 @bot.command()
+@has_permissions(manage_roles=True, ban_members=True)
 async def top(ctx):
     res = []
     global called
+    global break_loop    
     if called:
-        msg = await ctx.send('`Session Already Active`')
+        msg = await ctx.reply('`Session Already Active`')
         return await msg.delete(delay=5)
-    else:    
+    else: 
+        await ctx.reply('`Starting Subscription`')   
         called = True
-        while True:
+        break_loop = False
+        while True and not break_loop:
             embed = None
             embed = await _fetch(ctx, res)
             await ctx.send(embed = embed)
-            await asyncio.sleep(24*60*60)        
+            await asyncio.sleep(24*60*60)  
+
+@bot.command()
+@has_permissions(manage_roles=True, ban_members=True)
+async def stop(ctx):
+    global called, break_loop    
+    break_loop, called = True, False
+    return await ctx.reply('`Subscription Cancelled`')
      
 async def _fetch(ctx, res):
     async with aiohttp.ClientSession() as session:
@@ -44,9 +57,15 @@ async def _fetch(ctx, res):
             chars = [len(i) for i in res]
             if chars[0] > 2048:
                 res = res[:-1]
-            embed = discord.Embed(title = f'`Fetching Top Arxiv Posts`', 
+            embed = discord.Embed(title = f'`Top SciRate papers`', 
                                         description = '\n'.join(res),
                                         color = 0xe8e3e3)
             return embed
+
+@top.error
+@stop.error
+async def top_stop_error(ctx, error):
+    if isinstance(error, MissingPermissions):
+        return await ctx.reply('Missing Permissions')            
 
 bot.run(config.TOKEN, bot=True, reconnect=True)
