@@ -36,7 +36,7 @@ async def top(ctx, *, arg=None):
         embed = None
         embed = await _fetch(ctx, res, arg)     
         await ctx.send(embed = embed)
-        await asyncio.sleep(2)  
+        await asyncio.sleep(config.TIME)  
 
 @bot.command()
 @has_permissions(manage_roles=True, ban_members=True)
