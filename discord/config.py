@@ -1,0 +1,3 @@
+TOKEN=''
+PREFIX='!?'
+TIME=5
