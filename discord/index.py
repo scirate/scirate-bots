@@ -58,9 +58,10 @@ async def _fetch(ctx, res, arg=None):
                 await ctx.reply('`Falied to fetch data | Try again later`', mention_author=False)
             resp_text = await response.text()
             soup = BeautifulSoup(resp_text, 'html.parser')
-            res = []            
-            for title in soup.find_all("div", class_="title")[:10]:
-                res.append(f'[`{title.find("a").contents[0]}`]({"https://scirate.com" + title.find("a")["href"]})')               
+            res = []
+            ratings = list(map(lambda x : x.text, soup.find_all("button", class_="btn btn-default count")[:10]))
+            for title, rating in list(zip(soup.find_all("div", class_="title")[:10], ratings)):
+                res.append(f'**{rating}** [`{title.find("a").contents[0]}`]({"https://scirate.com" + title.find("a")["href"]})')               
             res[0] = '•' + res[0]
             chars = [len(i) for i in res]
             if chars[0] > 2048:
@@ -74,7 +75,7 @@ async def _fetch(ctx, res, arg=None):
 @stop.error
 async def top_stop_error(ctx, error):
     if isinstance(error, MissingPermissions):
-        return await ctx.reply('Missing Permissions') 
+        return await ctx.reply('`Missing Permissions`') 
     else:
         pass           
 
