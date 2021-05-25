@@ -1,3 +1,3 @@
 TOKEN=''
 PREFIX='!?'
-TIME=5
+TIME=24*60*60

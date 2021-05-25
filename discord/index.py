@@ -14,7 +14,7 @@ bot=commands.Bot(command_prefix=commands.when_mentioned_or(config.PREFIX),
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Game(name='Watching Scirate'))
+    await bot.change_presence(activity=discord.Game(name='SciRate'))
     print(f'Logged in as {bot.user.name}')
     return
 
