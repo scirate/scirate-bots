@@ -9,7 +9,8 @@ import config
 called = False
 break_loop = False
 bot=commands.Bot(command_prefix=commands.when_mentioned_or(config.PREFIX), 
-                intents = discord.Intents.default()
+                intents = discord.Intents.default(), 
+                help_command=None
 )
 
 @bot.event
@@ -23,17 +24,17 @@ async def on_ready():
 async def top(ctx, *, arg=None):
     global called, break_loop 
     res=[]
-    while arg:
+    if arg:
         if len(arg) > 20:
             return await ctx.reply('`Query Character Limit Exceeded`')
-        elif called:
-            msg = await ctx.reply('`Session Already Active`')
-            return await msg.delete(delay=5)    
-        break          
+        elif arg == 'now':
+            embed = await _fetch(ctx, res, arg)     
+            return await ctx.send(embed = embed)
+    if await _check_called(ctx, called):
+        return 
     await ctx.reply('`Starting Subscription`')   
     called, break_loop = True, False
     while True and not break_loop:
-        embed = None
         embed = await _fetch(ctx, res, arg)     
         await ctx.send(embed = embed)
         await asyncio.sleep(config.TIME)  
@@ -77,6 +78,24 @@ async def top_stop_error(ctx, error):
     if isinstance(error, MissingPermissions):
         return await ctx.reply('`Missing Permissions`') 
     else:
-        pass           
+        pass 
+
+async def _check_called(ctx, state):
+    if state: 
+        msg = await ctx.reply('`Session Already Active`')
+        await msg.delete(delay=5)
+        return state
+help_dict = {
+            "**Top Scites**": "<@&846783290332413964>`top`", 
+            "**Now Scites**": "<@&846783290332413964>`top now`",
+            "**Stop Scites**": "<@&846783290332413964>`stop`"
+            }
+
+@bot.command()
+async def help(ctx):
+    embed = discord.Embed(title = f'`SciRate Help`', color = 0xe8e3e3)
+    for key, value in help_dict.items():
+        embed.add_field(name=key, value=value)
+    return await ctx.send(embed=embed)
 
 bot.run(config.TOKEN, bot=True, reconnect=True)
