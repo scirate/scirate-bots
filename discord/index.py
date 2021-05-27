@@ -80,7 +80,7 @@ async def _fetch(ctx, res, arg=None):
             except:
                 return False
             else:                            
-                res[0] = '•' + res[0]
+                res[0] += '•'
                 embed = discord.Embed(title = f'`Top SciRate papers`', 
                                     description = '\n•'.join(res),
                                     color = 0xe8e3e3)
@@ -108,8 +108,8 @@ async def _check_args(ctx, arg):
     return False
     
 help_dict = {
-            "**Start Scites**": "<@&846783290332413964>`start`", 
-            "**Now Scites**": "<@&846783290332413964>`start now`",
+            "**Start Scites**": "<@&846783290332413964>`start <query>`", 
+            "**Now Scites**": "<@&846783290332413964>`now <query>`",
             "**Stop Scites**": "<@&846783290332413964>`stop`"
             }
 
@@ -117,7 +117,7 @@ help_dict = {
 async def help(ctx):
     embed = discord.Embed(title = f'`SciRate Help`', color = 0xe8e3e3)
     for key, value in help_dict.items():
-        embed.add_field(name=key, value=value)
+        embed.add_field(name=key, value=value, inline=False)
     return await ctx.send(embed=embed)
 
 bot.run(config.TOKEN, bot=True, reconnect=True)
