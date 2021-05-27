@@ -21,7 +21,7 @@ async def on_ready():
 
 @bot.command()
 @has_permissions(manage_roles=True, ban_members=True)
-async def top(ctx, *, arg=None):
+async def start(ctx, *, arg=None):
     global called, break_loop 
     res=[]
     if arg:
@@ -72,9 +72,9 @@ async def _fetch(ctx, res, arg=None):
                                         color = 0xe8e3e3)
             return embed
 
-@top.error
+@start.error
 @stop.error
-async def top_stop_error(ctx, error):
+async def start_stop_error(ctx, error):
     if isinstance(error, MissingPermissions):
         return await ctx.reply('`Missing Permissions`') 
     else:
@@ -86,8 +86,8 @@ async def _check_called(ctx, state):
         await msg.delete(delay=5)
         return state
 help_dict = {
-            "**Top Scites**": "<@&846783290332413964>`top`", 
-            "**Now Scites**": "<@&846783290332413964>`top now`",
+            "**Start Scites**": "<@&846783290332413964>`start`", 
+            "**Now Scites**": "<@&846783290332413964>`start now`",
             "**Stop Scites**": "<@&846783290332413964>`stop`"
             }
 
