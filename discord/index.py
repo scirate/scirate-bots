@@ -21,21 +21,31 @@ async def on_ready():
 
 @bot.command()
 @has_permissions(manage_roles=True, ban_members=True)
+async def now(ctx, *, arg=None):
+    if await _check_args(ctx, arg):
+        return 
+    res=[]
+    embed = await _fetch(ctx, res, arg)
+    if not embed:
+            return await ctx.reply('`No Results Found`') 
+    return await ctx.send(embed = embed)
+
+@bot.command()
+@has_permissions(manage_roles=True, ban_members=True)
 async def start(ctx, *, arg=None):
     global called, break_loop 
     res=[]
     if arg:
         if len(arg) > 20:
-            return await ctx.reply('`Query Character Limit Exceeded`')
-        elif arg == 'now':
-            embed = await _fetch(ctx, res, arg)     
-            return await ctx.send(embed = embed)
+            return await ctx.reply('`Query Character Limit Exceeded`')            
     if await _check_called(ctx, called):
         return 
     await ctx.reply('`Starting Subscription`')   
     called, break_loop = True, False
     while True and not break_loop:
-        embed = await _fetch(ctx, res, arg)     
+        embed = await _fetch(ctx, res, arg)
+        if not embed:
+            return await ctx.reply('`No Results Found`')     
         await ctx.send(embed = embed)
         await asyncio.sleep(config.TIME)  
 
@@ -63,14 +73,18 @@ async def _fetch(ctx, res, arg=None):
             ratings = list(map(lambda x : x.text, soup.find_all("button", class_="btn btn-default count")[:10]))
             for title, rating in list(zip(soup.find_all("div", class_="title")[:10], ratings)):
                 res.append(f'**{rating}** [`{title.find("a").contents[0]}`]({"https://scirate.com" + title.find("a")["href"]})')               
-            res[0] = '•' + res[0]
-            chars = [len(i) for i in res]
-            if chars[0] > 2048:
-                res = res[:-1]
-            embed = discord.Embed(title = f'`Top SciRate papers`', 
-                                        description = '\n•'.join(res),
-                                        color = 0xe8e3e3)
-            return embed
+            try:
+                chars = [len(i) for i in res]
+                if chars[0] > 2048:
+                    res = res[:-1]
+            except:
+                return False
+            else:                            
+                res[0] = '•' + res[0]
+                embed = discord.Embed(title = f'`Top SciRate papers`', 
+                                    description = '\n•'.join(res),
+                                    color = 0xe8e3e3)
+                return embed
 
 @start.error
 @stop.error
@@ -85,6 +99,14 @@ async def _check_called(ctx, state):
         msg = await ctx.reply('`Session Already Active`')
         await msg.delete(delay=5)
         return state
+
+async def _check_args(ctx, arg):
+    if arg:
+        if len(arg) > 20:
+            await ctx.reply('`Query Character Limit Exceeded`')
+            return True
+    return False
+    
 help_dict = {
             "**Start Scites**": "<@&846783290332413964>`start`", 
             "**Now Scites**": "<@&846783290332413964>`start now`",
