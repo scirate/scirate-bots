@@ -21,29 +21,24 @@ async def on_ready():
 
 @bot.command()
 @has_permissions(manage_roles=True, ban_members=True)
-async def now(ctx, *, arg=None):
-    if await _check_args(ctx, arg):
-        return 
+async def now(ctx):
     res=[]
-    embed = await _fetch(ctx, res, arg)
+    embed = await _fetch(ctx, res)
     if not embed:
             return await ctx.reply('`No Results Found`') 
     return await ctx.send(embed = embed)
 
 @bot.command()
 @has_permissions(manage_roles=True, ban_members=True)
-async def start(ctx, *, arg=None):
+async def start(ctx):
     global called, break_loop 
     res=[]
-    if arg:
-        if len(arg) > 20:
-            return await ctx.reply('`Query Character Limit Exceeded`')            
     if await _check_called(ctx, called):
         return 
     await ctx.reply('`Starting Subscription`')   
     called, break_loop = True, False
     while True and not break_loop:
-        embed = await _fetch(ctx, res, arg)
+        embed = await _fetch(ctx, res)
         if not embed:
             return await ctx.reply('`No Results Found`')     
         await ctx.send(embed = embed)
@@ -59,10 +54,7 @@ async def stop(ctx):
     return await ctx.reply('`Subscription Cancelled`')
      
 async def _fetch(ctx, res, arg=None):
-    if arg:
-        render_link=f'https://scirate.com/search?utf8=%E2%9C%93&q={arg}'
-    elif arg == None:
-        render_link=f'https://scirate.com/'
+    render_link=f'https://scirate.com/'
     async with aiohttp.ClientSession() as session:
         async with session.get(render_link) as response:
             if response.status != 200:
@@ -100,16 +92,9 @@ async def _check_called(ctx, state):
         await msg.delete(delay=5)
         return state
 
-async def _check_args(ctx, arg):
-    if arg:
-        if len(arg) > 20:
-            await ctx.reply('`Query Character Limit Exceeded`')
-            return True
-    return False
-    
 help_dict = {
-            "**Start Scites**": "<@&846783290332413964>`start <query>`", 
-            "**Now Scites**": "<@&846783290332413964>`now <query>`",
+            "**Start Scites**": "<@&846783290332413964>`start`",
+            "**Now Scites**": "<@&846783290332413964>`now`",
             "**Stop Scites**": "<@&846783290332413964>`stop`"
             }
 
